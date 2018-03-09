@@ -86,6 +86,24 @@ class CircleEdgeView(ctx : Context) : View(ctx) {
             state.startUpdating(startcb)
         }
     }
+    data class Renderer(var view : CircleEdgeView) {
+        val circleEdge : CircleEdge = CircleEdge(0)
+        val animator : Animator = Animator(view)
+        fun render(canvas : Canvas, paint : Paint) {
+            canvas.drawColor(Color.parseColor("#212121"))
+            circleEdge.draw(canvas, paint)
+            animator.animate {
+                circleEdge.update {
+                    animator.stop()
+                }
+            }
+        }
+        fun handleTap() {
+            circleEdge.startUpdating {
+                animator.start()
+            }
+        }
+    }
 }
 fun Canvas.drawEdgePath(r : Float, deg : Float, scale : Float,paint : Paint)  {
     val path = Path()
