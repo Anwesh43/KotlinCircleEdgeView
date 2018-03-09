@@ -3,6 +3,7 @@ package ui.anwesome.com.circleedgeview
 /**
  * Created by anweshmishra on 09/03/18.
  */
+import android.app.Activity
 import android.graphics.*
 import android.content.*
 import android.view.*
@@ -103,6 +104,13 @@ class CircleEdgeView(ctx : Context) : View(ctx) {
             circleEdge.startUpdating {
                 animator.start()
             }
+        }
+    }
+    companion object {
+        fun create(activity : Activity, w : Int, h : Int):CircleEdgeView {
+            val view = CircleEdgeView(activity)
+            activity.addContentView(view, ViewGroup.LayoutParams(w, h))
+            return view
         }
     }
 }
