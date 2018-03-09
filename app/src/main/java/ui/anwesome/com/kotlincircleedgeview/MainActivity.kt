@@ -8,6 +8,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        CircleEdgeView.create(this, 500, 500)
+        CircleEdgeView.createFullScreen(this)
     }
 }
