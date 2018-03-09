@@ -24,7 +24,7 @@ class CircleEdgeView(ctx : Context) : View(ctx) {
     data class State(var scale : Float = 0f, var dir : Float = 0f, var prevScale : Float = 0f) {
         fun update(stopcb : (Float) -> Unit) {
             scale += dir * 0.1f
-            if(Math.abs(scale - prevScale) > 0) {
+            if(Math.abs(scale - prevScale) > 1) {
                 scale = prevScale + dir
                 dir = 0f
                 prevScale = scale
@@ -76,7 +76,8 @@ class CircleEdgeView(ctx : Context) : View(ctx) {
             for(i in 0..k-1) {
                 canvas.save()
                 canvas.rotate(i * deg)
-                canvas.drawEdgePath(size, deg, state.scale, paint)
+                canvas.drawEdgePath(size, deg/2, state.scale, paint)
+                canvas.drawArc(RectF(-size/2, -size/2, size/2, size/2),deg/2, deg/2, false, paint)
                 canvas.restore()
             }
             canvas.restore()
@@ -88,12 +89,19 @@ class CircleEdgeView(ctx : Context) : View(ctx) {
             state.startUpdating(startcb)
         }
     }
-    data class Renderer(var view : CircleEdgeView) {
+    data class Renderer(var view : CircleEdgeView, var time : Int = 0) {
         val circleEdge : CircleEdge = CircleEdge(0)
         val animator : Animator = Animator(view)
         fun render(canvas : Canvas, paint : Paint) {
+            if (time == 0) {
+                paint.color = Color.parseColor("#F4511E")
+                paint.strokeWidth = Math.min(canvas.width.toFloat(), canvas.height.toFloat()) / 60
+                paint.strokeCap = Paint.Cap.ROUND
+                paint.style = Paint.Style.STROKE
+            }
             canvas.drawColor(Color.parseColor("#212121"))
             circleEdge.draw(canvas, paint)
+            time++
             animator.animate {
                 circleEdge.update {
                     animator.stop()
@@ -116,18 +124,14 @@ class CircleEdgeView(ctx : Context) : View(ctx) {
 }
 fun Canvas.drawEdgePath(r : Float, deg : Float, scale : Float,paint : Paint)  {
     val path = Path()
-    for(i in 0..deg.toInt()) {
-        val sf = Math.floor((i - 0.5*deg)/(0.5*deg))
+    path.moveTo(r/2, 0f)
+    for(i in 1..deg.toInt()-1) {
+        val sf = Math.floor((i)/(0.5*deg))
         val deg_factor = (deg * sf - ((2 * sf - 1) * (i))) / (0.5 * deg)
-        val updated_r = (r/2 + r/2 * deg_factor)
+        val updated_r =  r/2 + ((r * 0.5) * deg_factor * scale)
         val x = (updated_r * Math.cos(i * Math.PI/180)).toFloat()
-        val y = r * Math.sin(i * Math.PI/180).toFloat()
-        if (i == 0) {
-            path.moveTo(x, y)
-        }
-        else {
-            path.lineTo(x, y)
-        }
+        val y = (updated_r * Math.sin(i * Math.PI/180)).toFloat()
+        path.lineTo(x, y)
     }
     drawPath(path, paint)
 }
