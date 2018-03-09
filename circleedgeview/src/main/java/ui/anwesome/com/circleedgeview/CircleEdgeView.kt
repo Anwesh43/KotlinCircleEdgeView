@@ -61,4 +61,46 @@ class CircleEdgeView(ctx : Context) : View(ctx) {
             }
         }
     }
+    data class CircleEdge(var i : Int) {
+        val state = State()
+        fun draw(canvas : Canvas, paint : Paint) {
+            val k = 6
+            val deg = 360f/k
+            val w = canvas.width.toFloat()
+            val h = canvas.height.toFloat()
+            val size = Math.min(w,h)/3
+            canvas.save()
+            canvas.translate(w/2, h/2)
+            for(i in 0..k-1) {
+                canvas.save()
+                canvas.rotate(i * deg)
+                canvas.drawEdgePath(size, deg, state.scale, paint)
+                canvas.restore()
+            }
+            canvas.restore()
+        }
+        fun update(stopcb : (Float) -> Unit) {
+            state.update(stopcb)
+        }
+        fun startUpdating(startcb : () -> Unit) {
+            state.startUpdating(startcb)
+        }
+    }
+}
+fun Canvas.drawEdgePath(r : Float, deg : Float, scale : Float,paint : Paint)  {
+    val path = Path()
+    for(i in 0..deg.toInt()) {
+        val sf = Math.floor((i - 0.5*deg)/(0.5*deg))
+        val deg_factor = (deg * sf - ((2 * sf - 1) * (i))) / (0.5 * deg)
+        val updated_r = (r/2 + r/2 * deg_factor)
+        val x = (updated_r * Math.cos(i * Math.PI/180)).toFloat()
+        val y = r * Math.sin(i * Math.PI/180).toFloat()
+        if (i == 0) {
+            path.moveTo(x, y)
+        }
+        else {
+            path.lineTo(x, y)
+        }
+    }
+    drawPath(path, paint)
 }
