@@ -6,6 +6,7 @@ package ui.anwesome.com.circleedgeview
 import android.app.Activity
 import android.graphics.*
 import android.content.*
+import android.support.v7.app.AppCompatActivity
 import android.view.*
 class CircleEdgeView(ctx : Context) : View(ctx) {
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -115,9 +116,21 @@ class CircleEdgeView(ctx : Context) : View(ctx) {
         }
     }
     companion object {
-        fun create(activity : Activity, w : Int, h : Int):CircleEdgeView {
+        fun create(activity : Activity, w : Int, h : Int) : CircleEdgeView {
             val view = CircleEdgeView(activity)
             activity.addContentView(view, ViewGroup.LayoutParams(w, h))
+            return view
+        }
+        fun createFullScreen(activity : Activity) : CircleEdgeView {
+            if(activity is AppCompatActivity) {
+                (activity as AppCompatActivity).supportActionBar?.hide()
+            }
+            else {
+                activity.actionBar?.hide()
+            }
+            activity.window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            val view = CircleEdgeView(activity)
+            activity.setContentView(view)
             return view
         }
     }
