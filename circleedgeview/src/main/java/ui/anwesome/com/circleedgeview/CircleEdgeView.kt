@@ -146,5 +146,6 @@ fun Canvas.drawEdgePath(r : Float, deg : Float, scale : Float,paint : Paint)  {
         val y = (updated_r * Math.sin(i * Math.PI/180)).toFloat()
         path.lineTo(x, y)
     }
+    path.lineTo(r/2 * Math.cos(deg * Math.PI/180).toFloat(), r/2 * Math.sin(deg * Math.PI/180).toFloat())
     drawPath(path, paint)
 }
